@@ -1,0 +1,35 @@
+ORG 0000H
+    MOV SCON, #50H      
+    MOV TMOD, #20H      
+    MOV TH1, #-6        
+    SETB TR1            
+
+MAIN_LOOP:
+    ; Receiving Data
+    JNB RI, MAIN_LOOP   
+    MOV A, SBUF         
+    MOV P1, A           
+    CLR RI              
+    MOV DPTR, #MESS     
+
+SEND_MSG:
+    CLR A
+    MOVC A, @A+DPTR     
+    JZ MAIN_LOOP        
+    MOV SBUF, A         
+    JNB TI, $           
+    CLR TI              
+    INC DPTR            
+    SJMP SEND_MSG       
+
+MESS:
+    DB 'WELCOME TO VIIT', 0x0D, 0x0A
+    DB 'WELCOME TO ENTC', 0x0D, 0x0A
+    DB 'Aboli Chormale',0x0D,0x0A
+    DB 'PRN:223', 0x0D, 0x0A
+    DB 'Roll No.:211026', 0x0D, 0x0A
+    DB 'Batch:A2', 0x0D, 0x0A
+    DB 'Learning MCA', 0x0D, 0x0A
+    DB 0  ; Null-terminated string
+
+END
