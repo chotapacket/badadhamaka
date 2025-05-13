@@ -1,0 +1,55 @@
+#define F_CPU 8000000UL   // Define CPU frequency as 8MHz
+#include <avr/io.h>       // Include AVR I/O library
+#include <util/delay.h>   // Include delay functions
+#include <stdio.h>        // Include standard I/O functions
+#include "LCD.h"         // Include LCD header file
+
+#define degree_symbol 0xdf // Define degree symbol for LCD display
+
+// Function to initialize ADC
+void ADC_Init()
+{
+	DDRA = 0x00;    // Set PORTA as input for ADC
+	ADCSRA = 0x87;  // Enable ADC with prescaler 128
+	ADMUX = 0x40;   // Select ADC channel 0 with AVCC as reference voltage
+}
+
+// Function to read ADC value from a given channel
+int ADC_Read(char channel)
+{
+	ADMUX = 0x40 | (channel & 0x07); // Select ADC channel
+	ADCSRA |= (1<<ADSC);            // Start ADC conversion
+	while (!(ADCSRA & (1<<ADIF)));  // Wait for conversion to complete
+	ADCSRA |= (1<<ADIF);            // Clear ADC interrupt flag
+	_delay_ms(1);                   // Small delay for stability
+	return ADCW;                    // Return ADC result
+}
+
+// Main function
+int main()
+{
+	char Temperature[10];  // Array to store temperature string
+	float celsius;         // Variable to store temperature value
+	LCD_Init();            // Initialize LCD
+	ADC_Init();            // Initialize ADC
+
+	while(1)
+	{
+		LCD_Command(0x80);            // Move cursor to first line
+		LCD_String("ABC"); // Display name on LCD
+		LCD_Command(0xC0);            // Move cursor to second line
+
+		celsius = (ADC_Read(0)*4.88);  // Read ADC value from channel 0
+		celsius = (celsius/10.00);     // Convert to Celsius
+		sprintf(Temperature,"%d%cC ",(int)celsius, degree_symbol); // Format temperature
+		LCD_String(Temperature);       // Display temperature on LCD
+		
+		celsius = (ADC_Read(1)*4.88);  // Read ADC value from channel 1
+		celsius = (celsius/10.00);     // Convert to Celsius
+		sprintf(Temperature,"%d%cC ",(int)celsius, degree_symbol); // Format temperature
+		LCD_String(Temperature);       // Display temperature on LCD
+		
+	
+
+	}
+}
