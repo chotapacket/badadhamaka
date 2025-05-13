@@ -1,1 +1,37 @@
+ORG 0000H
 
+START: MOV R4,#06 ; Load 6 steps for 180° Clockwise Rotation
+
+L1: MOV P1,#03H ; Step 1: Coil 1 & 2 ON
+    ACALL DELAY
+    MOV P1,#06H ; Step 2: Coil 2 & 3 ON
+    ACALL DELAY
+    MOV P1,#0CH ; Step 3: Coil 3 & 4 ON
+    ACALL DELAY
+    MOV P1,#09H ; Step 4: Coil 4 & 1 ON
+    ACALL DELAY
+    DJNZ R4,L1 ; Decrease Counter Until 6 Steps Completed
+
+MOV R4,#06 ; Load 6 steps for 180° Anticlockwise Rotation
+
+L2: MOV P1,#09H ; Step 4: Coil 4 & 1 ON (Reverse)
+    ACALL DELAY
+    MOV P1,#0CH ; Step 3: Coil 3 & 4 ON (Reverse)
+    ACALL DELAY
+    MOV P1,#06H ; Step 2: Coil 2 & 3 ON (Reverse)
+    ACALL DELAY
+    MOV P1,#03H ; Step 1: Coil 1 & 2 ON (Reverse)
+    ACALL DELAY
+    DJNZ R4,L2 ; Decrease Counter Until 6 Steps Completed
+    SJMP START ; Repeat the Process Continuously
+
+DELAY:
+    MOV R1,#255
+L3: MOV R2,#255
+L4: MOV R3,#02
+L5: DJNZ R3,L5
+    DJNZ R2,L4
+    DJNZ R1,L3
+    RET
+
+END
