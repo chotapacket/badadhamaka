@@ -1,1 +1,69 @@
+ORG 0000H              
 
+    MOV SCON, #50H         ; Set UART in Mode 1 (8-bit UART) and enable receiver
+    MOV TMOD, #20H         ; Set Timer 1 in Mode 2 (8-bit auto-reload)
+    MOV TH1, #-3           ; Load TH1 with -3 for 9600 baud rate
+    SETB TR1               ; Start Timer 1 (for generating baud rate)
+
+L1: 
+    
+    MOV A, #'W'            ; Load character 'W' into accumulator
+    ACALL TRANS            ; Call the transmit subroutine
+
+    MOV A, #'E'
+    ACALL TRANS
+ 
+    MOV A, #'L'
+    ACALL TRANS
+
+    MOV A, #'C'
+    ACALL TRANS
+
+    MOV A, #'O'
+    ACALL TRANS
+
+    MOV A, #'M'
+    ACALL TRANS
+
+    MOV A, #'E'
+    ACALL TRANS
+
+    MOV A, #' '       		; add space
+    ACALL TRANS
+
+    MOV A, #'T'
+    ACALL TRANS
+
+    MOV A, #'O'
+    ACALL TRANS
+
+    MOV A, #' '
+    ACALL TRANS
+
+    MOV A, #'V'
+    ACALL TRANS
+
+    MOV A, #'I'
+    ACALL TRANS
+
+    MOV A, #'I'
+    ACALL TRANS
+
+    MOV A, #'T'
+    ACALL TRANS
+
+    MOV A, #0x0A           ; Line Feed (LF) - Moves cursor to next line
+    ACALL TRANS
+    MOV A, #0x0D           ; Carriage Return (CR) - Moves cursor to beginning of the line
+    ACALL TRANS
+
+    SJMP L1                ; Infinite loop to continuously send the message
+
+
+TRANS: 					   ; Subroutine to transmit data via UART
+    MOV SBUF, A            ; Move data from accumulator to serial buffer (SBUF)
+    JNB TI, $              ; Wait here until TI (Transmit Interrupt) flag is set (transmission complete)
+    CLR TI                 ; Clear TI flag for the next transmission
+    RET                    ; Return from subroutine
+
+    END                    ; End of program
