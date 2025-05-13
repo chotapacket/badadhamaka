@@ -1,0 +1,25 @@
+ORG 0000H         ; Set origin at address 0000H
+SETB P1.0         ; Set P1.0 as input (First bit of addition)
+SETB P1.1         ; Set P1.1 as input (Second bit of addition)
+
+Start: 			  ; Compute SUM = A XOR B
+    
+    MOV C, P1.1   ; Move P1.1 (B) to Carry
+    CPL C         ; Complement Carry (C = NOT B)
+    ANL C, P1.0   ; AND with A (C = A AND NOT B)
+    MOV R0, C     ; Store intermediate result in Register R0
+
+    MOV C, P1.0   ; Move P1.0 (A) to Carry
+    CPL C         ; Complement Carry (C = NOT A)
+    ANL C, P1.1   ; AND with B (C = B AND NOT A)
+    ORL C, R0     ; OR with previously stored result
+    MOV P1.2, C   ; Store SUM output in P1.2
+
+				  ; Compute CARRY = A AND B
+    MOV C, P1.0   ; Move P1.0 (A) to Carry
+    ANL C, P1.1   ; AND with P1.1
+    MOV P1.3, C   ; Store CARRY output in P1.3
+
+    SJMP Start    ; Infinite loop to continuously check inputs
+
+END
