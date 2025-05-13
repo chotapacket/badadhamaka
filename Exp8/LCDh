@@ -1,0 +1,61 @@
+#define F_CPU 8000000UL // Define CPU frequency for delay calculations
+#include <avr/io.h> // Include AVR input/output header
+#include <util/delay.h> // Include delay utility header
+
+// Define LCD control and data port directions
+#define LCD_Data_Dir DDRC // Data direction register for LCD data
+#define LCD_Command_Dir DDRD // Data direction register for LCD commands
+#define LCD_Data_Port PORTC // Port for LCD data
+#define LCD_Command_Port PORTD // Port for LCD commands
+#define RS PD7 // Register Select pin
+#define RW PD6 // Read/Write pin
+#define EN PD5 // Enable pin
+
+// Function to initialize the LCD
+void LCD_Init(void)
+{
+	LCD_Command_Dir = 0xFF; // Set command port as output
+	LCD_Data_Dir = 0xFF; // Set data port as output
+	_delay_ms(20); // Wait for LCD to power up
+
+	LCD_Command(0x38); // Set 8-bit mode, 2-line display, 5x8 dots
+	LCD_Command(0x0C); // Display ON, Cursor OFF
+	LCD_Command(0x06); // Auto increment cursor
+	LCD_Command(0x01); // Clear display screen
+	_delay_ms(2); // Wait for command execution
+	LCD_Command(0x80); // Move cursor to beginning of first line
+}
+
+// Function to send a command to the LCD
+void LCD_Command(unsigned char cmnd)
+{
+	LCD_Data_Port = cmnd; // Send command to data port
+	LCD_Command_Port &= ~(1<<RS); // RS=0 for command mode
+	LCD_Command_Port &= ~(1<<RW); // RW=0 for write mode
+	LCD_Command_Port |= (1<<EN); // Generate enable pulse
+	_delay_us(1); // Short delay for processing
+	LCD_Command_Port &= ~(1<<EN); // Disable enable
+	_delay_ms(2); // Wait for command execution
+}
+
+// Function to send a character to the LCD
+void LCD_Char(unsigned char char_data)
+{
+	LCD_Data_Port = char_data; // Send character to data port
+	LCD_Command_Port |= (1<<RS); // RS=1 for data mode
+	LCD_Command_Port &= ~(1<<RW); // RW=0 for write mode
+	LCD_Command_Port |= (1<<EN); // Generate enable pulse
+	_delay_us(1); // Short delay for processing
+	LCD_Command_Port &= ~(1<<EN); // Disable enable
+	_delay_ms(2); // Wait for character execution
+}
+
+// Function to send a string to the LCD
+void LCD_String(char *str)
+{
+	int i;
+	for (i = 0; str[i] != 0; i++) // Loop until end of string
+	{
+		LCD_Char(str[i]); // Display each character
+	}
+}
