@@ -1,0 +1,25 @@
+ORG 0000H     
+    
+    MOV SCON, #50H         ; Configure the Serial Control (SCON) register:
+         
+    
+    MOV TMOD, #20H         ; Set Timer Mode:
+                           ; Timer 1 (T1) in Mode 2 (8-bit auto-reload).
+    
+    MOV TH1, #64           ; Load TH1 with 64 (0x40) for 2400 bps
+                           ; Formula: Baud Rate = 11.0592 MHz / (12 * (256 - TH1))
+    
+L1: SETB TR1              ; Start Timer 1 to begin baud rate generation.
+
+    JNB RI, $             ; Infinite loop until the RI flag is set.
+                          ; This indicates that a byte has been received.
+
+    MOV A, SBUF           ; Move the received byte from the Serial Buffer (SBUF) to the Accumulator
+
+    MOV P1, A             ; Output the received data to Port 1 connected to LEDs.
+
+    CLR RI                ; Clear the RI flag
+
+    SJMP L1               ; Repeat the process by jumping back to label L1
+
+    END                   ; End of program
