@@ -1,0 +1,9 @@
+ORG 000H
+	SETB RS0
+	CLR RS1			;Select Bank 1
+	MOV R0,#21H		;First BCD Number in R0
+	MOV R1,#30H		;Second BCD Number in R1
+	MOV A,R0
+	ADD A,R1		;Addition
+	DA A			;Convert to BCD
+	END
