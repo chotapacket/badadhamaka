@@ -1,0 +1,11 @@
+ORG 0000H
+	MOV R0, #30H			;Destination Address (Internal Memory)
+	MOV DPTR, #1000H		;Source Address (External Memory)			
+	MOV R1, #05			    ;Block Length (Counter)
+	
+L1:	MOV A,@R0			    ;Read a byte from external memory
+	MOVX @DPTR, A			;Write the byte to internal memory
+	INC R0
+	INC DPTR				;Increment source address					
+	DJNZ R1, L1				;Decrement counter and repeat if not zero
+	END
