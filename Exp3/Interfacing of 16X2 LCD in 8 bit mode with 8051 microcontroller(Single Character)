@@ -1,0 +1,95 @@
+lcd     equ p0         ; Define LCD data port
+rs      equ p2.0       ; Register Select pin (RS)
+en      equ p2.1       ; Enable pin (EN)
+rw      equ p2.2       ; Read/Write pin (RW)
+
+        org 0000h      ; Start of the program memory
+
+        ; Initialize LCD
+        MOV A, #38H    ; Function set: 2 lines, 5x7 dots
+        acall comm
+        MOV A, #0EH    ; Display ON, cursor ON
+        acall comm
+        MOV A, #01H    ; Clear display
+        acall comm
+        MOV A, #06H    ; Entry mode: Increment cursor
+        acall comm
+        MOV A, #80H    ; Set cursor to the first line
+        acall comm
+
+        ; Display "ABCDE" on the first line
+        MOV A, #'A'    ; Display 'A'
+        acall display
+        MOV A, #'B'    ; Display 'B'
+        acall display
+        MOV A, #'C'    ; Display 'C'
+        acall display
+        MOV A, #'D'    ; Display 'D'
+        acall display
+        MOV A, #'E'    ; Display 'E'
+        acall display
+
+        ; Move to the second line
+        MOV A, #0C0H   ; Set cursor to the second line
+        acall comm
+
+        ; Display "211058" on the second line
+        MOV A, #'1'    ; Display '1'
+        acall display
+        MOV A, #'1'    ; Display '1'
+        acall display
+        MOV A, #'1'    ; Display '1'
+        acall display
+        MOV A, #'0'    ; Display '0'
+        acall display
+        MOV A, #'0'    ; Display '0'
+        acall display
+        MOV A, #'0'    ; Display '0'
+        acall display
+
+
+; Function: comm
+; Description: Sends command to the LCD
+; Input: A register contains command byte
+
+comm:
+        acall delay     ; Wait before sending command
+        MOV lcd, A      ; Send command to LCD
+        clr rs          ; RS = 0 (Command register)
+        clr rw          ; RW = 0 (Write mode)
+        setb en         ; Enable pulse
+        nop
+        nop
+        clr en          ; Clear enable pulse
+        ret
+
+
+; Function: display
+; Description: Sends data to the LCD for display
+; Input: A register contains character byte
+
+display:
+        acall delay     ; Wait before sending data
+        MOV lcd, A      ; Send character to LCD
+        setb rs         ; RS = 1 (Data register)
+        clr rw          ; RW = 0 (Write mode)
+        setb en         ; Enable pulse
+        nop
+        nop
+        clr en          ; Clear enable pulse
+        ret
+
+
+; Function: delay
+; Description: Provides a time delay
+
+delay:
+        mov R6, #20     ; Outer loop counter
+d1:     mov R7, #250    ; Inner loop counter
+d2:     djnz R7, d2     ; Decrement inner loop
+        djnz R6, d1     ; Decrement outer loop
+        ret
+
+ ; Infinite loop to keep the program running
+        sjmp $
+        end
