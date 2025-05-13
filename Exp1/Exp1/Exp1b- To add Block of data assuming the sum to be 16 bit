@@ -1,0 +1,14 @@
+ORG 000H
+	MOV R0,#30H		;Source Address
+	MOV R1,#05H		;Block Length
+	MOV R3,#00		;MSB in R3 00
+	MOV A,@R0		;First Data
+	DEC R1			;Decrement BLCO Size by 1
+	L2: INC R0		;Point to next address
+	ADD A,@R0		;Add content 
+	JNC L1			;Check carry
+	INC R3			;If carry INC R3 by 1
+	L1: DJNZ R1,L2	;Check if all bytes are added
+	MOV R2,A		;Mov LSB result in A
+	MOV 0x30, A  	; Store result in memory address 0x30
+	END
