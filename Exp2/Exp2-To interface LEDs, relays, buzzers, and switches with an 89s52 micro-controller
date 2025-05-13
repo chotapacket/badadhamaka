@@ -1,0 +1,42 @@
+SW EQU P1.0       ; Define SW (Switch) at Port 1.0
+		RELAY EQU P1.1    ; Define RELAY at Port 1.1
+		BUZ EQU P1.2      ; Define BUZ (Buzzer) at Port 1.2
+		LED EQU P0        ; Define LED at Port 0
+
+		ORG 0000H         ; Start at memory location 0000H
+
+		SETB SW           ; Set SW as an input (pull-up enabled)
+
+START:  
+		JB SW, CASE1  ; If SW (P1.0) is high, jump to CASE1
+		SJMP CASE2    ; Otherwise, jump to CASE2
+
+CASE1:  
+		SETB RELAY    ; Turn ON the relay
+		SETB BUZ      ; Turn ON the buzzer
+		MOV LED, #0FFH ; Turn ON all LEDs (binary 11111111)
+		ACALL DELAY   ; Call delay subroutine
+		MOV LED, #00H  ; Turn OFF all LEDs (binary 00000000)
+		ACALL DELAY   ; Call delay subroutine
+		SJMP START    ; Repeat the process
+
+CASE2:  
+		CLR RELAY     ; Turn OFF the relay
+		CLR BUZ       ; Turn OFF the buzzer
+		MOV LED, #0AAH ; Set LED pattern 10101010
+		ACALL DELAY   ; Call delay subroutine
+		MOV LED, #055H ; Set LED pattern 01010101
+		ACALL DELAY   ; Call delay subroutine
+		SJMP START    ; Repeat the process
+
+  
+DELAY:  			  ; Delay Subroutine
+		MOV R2, #7    ; Outer loop counter
+	L3: MOV R1, #255  ; Middle loop counter
+	L2: MOV R0, #255  ; Inner loop counter
+	L1: DJNZ R0, L1   ; Decrement R0 until 0
+		DJNZ R1, L2   ; Decrement R1 until 0
+		DJNZ R2, L3   ; Decrement R2 until 0
+		RET           ; Return from subroutine
+
+		END               ; End of program		
