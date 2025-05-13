@@ -1,0 +1,69 @@
+#define F_CPU 16000000UL // Define CPU frequency as 16 MHz
+#include <avr/io.h>
+#include <util/delay.h>
+#include <string.h>
+#include <stdio.h>
+
+// Function to increase motor speed gradually (ramp up)
+void rampUp(const char *direction)
+{
+	for (int i = 0; i <= 255; i += 25)
+	{
+		OCR0 = i; // Set duty cycle (PWM)
+		_delay_ms(800); // Delay for visibility
+	}
+}
+
+// Function to decrease motor speed gradually (ramp down)
+void rampDown(const char *direction)
+{
+	if (strcmp(direction, "Clockwise") == 0)
+	{
+		// For clockwise, increase again to mimic start-stop behavior
+		for (int i = 0; i <= 255; i += 25)
+		{
+			OCR0 = i;
+			_delay_ms(800);
+		}
+	}
+	else
+	{
+		// For anti-clockwise, decrease speed gradually
+		for (int i = 255; i >= 0; i -= 25)
+		{
+			OCR0 = i;
+			_delay_ms(800);
+		}
+	}
+}
+
+// Function to rotate motor in clockwise direction
+void clockwise()
+{
+	PORTB |= (1 << PB4); // Set PB4 high for clockwise rotation (IN1=1, IN2=0)
+	rampUp("Clockwise"); // Increase speed gradually
+	rampDown("Clockwise"); // Decrease speed gradually
+}
+
+// Function to rotate motor in anti-clockwise direction
+void anticlockwise()
+{
+	PORTB &= ~(1 << PB4); // Clear PB4 for anti-clockwise rotation (IN1=0, IN2=1)
+	rampUp("Anti-Clock"); // Increase speed gradually
+	rampDown("Anti-Clock"); // Decrease speed gradually
+}
+
+int main()
+{
+	DDRB |= (1 << PB3) | (1 << PB4); // Set PB3 (PWM output) and PB4 (direction control) as output
+	TCCR0 = 0x63; // Timer0: Fast PWM, Non-inverting mode, Prescaler = 64
+
+	while (1)
+	{
+		anticlockwise(); // Run motor in anti-clockwise direction
+		_delay_ms(800);  // Delay before changing direction
+
+		clockwise(); // Run motor in clockwise direction
+		_delay_ms(800); // Delay before changing direction
+	}
+}
