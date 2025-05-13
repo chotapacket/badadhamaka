@@ -1,0 +1,20 @@
+ORG 0000H    
+    MOV SCON, #50H   	; Set Serial Control Register: Mode 1 (8-bit UART), REN enabled
+    MOV TMOD, #20H   	; Timer 1, Mode 2
+    MOV TH1, #-3      ; Load TH1 for 9600 baud rate
+    SETB TR1         	; Start Timer 1 for serial communication
+
+L2: MOV DPTR, #MESS 	; Load DPTR with the address of the message
+
+L1: CLR A           	; Clear accumulator
+    MOVC A, @A+DPTR 	; Move the character from memory (pointed by DPTR) to A
+    JZ L2           	; If NULL (end of string), restart sending message
+    MOV SBUF, A     	; Move character to Serial Buffer (SBUF) for transmission
+    JNB TI, $       	; Wait until transmission is complete
+    CLR TI          	; Clear transmit interrupt flag
+    INC DPTR        	; Move to the next character in the message
+    SJMP L1         	; Repeat until the whole message is sent
+
+ORG 300H           		; Start of the message storage in memory
+    MESS: DB 'WELCOME TO VIIT', 0x0D, 0x0A,0
+END                		; End of program
