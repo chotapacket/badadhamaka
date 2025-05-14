@@ -1,69 +1,47 @@
-#define F_CPU 16000000UL // Define CPU frequency as 16 MHz
+#define F_CPU 16000000UL  // Define CPU frequency as 16 MHz
 #include <avr/io.h>
 #include <util/delay.h>
-#include <string.h>
-#include <stdio.h>
 
-// Function to increase motor speed gradually (ramp up)
-void rampUp(const char *direction)
+// Function to control motor direction and duty cycle ramping
+void motorControl(int direction)
 {
-	for (int i = 0; i <= 255; i += 25)
-	{
-		OCR0 = i; // Set duty cycle (PWM)
-		_delay_ms(800); // Delay for visibility
-	}
-}
+	int i;
 
-// Function to decrease motor speed gradually (ramp down)
-void rampDown(const char *direction)
-{
-	if (strcmp(direction, "Clockwise") == 0)
+	if (direction == 1)
 	{
-		// For clockwise, increase again to mimic start-stop behavior
-		for (int i = 0; i <= 255; i += 25)
-		{
-			OCR0 = i;
-			_delay_ms(800);
-		}
+		PORTB &= ~(1 << PB4);  // Set PB4 low for one direction
 	}
 	else
 	{
-		// For anti-clockwise, decrease speed gradually
-		for (int i = 255; i >= 0; i -= 25)
-		{
-			OCR0 = i;
-			_delay_ms(800);
-		}
+		PORTB |= (1 << PB4);   // Set PB4 high for opposite direction
 	}
-}
 
-// Function to rotate motor in clockwise direction
-void clockwise()
-{
-	PORTB |= (1 << PB4); // Set PB4 high for clockwise rotation (IN1=1, IN2=0)
-	rampUp("Clockwise"); // Increase speed gradually
-	rampDown("Clockwise"); // Decrease speed gradually
-}
+	// Ramp up speed
+	for (i = 0; i <= 255; i += 25)
+	{
+		OCR0 = i;
+		_delay_ms(1000);
+	}
 
-// Function to rotate motor in anti-clockwise direction
-void anticlockwise()
-{
-	PORTB &= ~(1 << PB4); // Clear PB4 for anti-clockwise rotation (IN1=0, IN2=1)
-	rampUp("Anti-Clock"); // Increase speed gradually
-	rampDown("Anti-Clock"); // Decrease speed gradually
+	// Ramp down speed
+	for (i = 255; i >= 0; i -= 25)
+	{
+		OCR0 = i;
+		_delay_ms(1000);
+	}
 }
 
 int main()
 {
-	DDRB |= (1 << PB3) | (1 << PB4); // Set PB3 (PWM output) and PB4 (direction control) as output
-	TCCR0 = 0x63; // Timer0: Fast PWM, Non-inverting mode, Prescaler = 64
+	DDRB |= (1 << PB3) | (1 << PB4);  // Set PB3 (OC0 - PWM output) and PB4 (Direction) as output
+	TCCR0 = 0xE3;  // Timer0: Fast PWM, non-inverted mode, Prescaler = 64
 
-	while (1)
+	while(1)
 	{
-		anticlockwise(); // Run motor in anti-clockwise direction
-		_delay_ms(800);  // Delay before changing direction
+		motorControl(1); // Run motor in one direction
+		_delay_ms(1000);
 
-		clockwise(); // Run motor in clockwise direction
-		_delay_ms(800); // Delay before changing direction
+		motorControl(0); // Run motor in opposite direction
+		_delay_ms(1000);
 	}
 }
