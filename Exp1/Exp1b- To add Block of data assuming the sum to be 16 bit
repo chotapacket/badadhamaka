@@ -1,14 +1,32 @@
-ORG 000H
-	MOV R0,#30H		;Source Address
-	MOV R1,#05H		;Block Length
-	MOV R3,#00		;MSB in R3 00
-	MOV A,@R0		;First Data
-	DEC R1			;Decrement BLCO Size by 1
-	L2: INC R0		;Point to next address
-	ADD A,@R0		;Add content 
-	JNC L1			;Check carry
-	INC R3			;If carry INC R3 by 1
-	L1: DJNZ R1,L2	;Check if all bytes are added
-	MOV R2,A		;Mov LSB result in A
-	MOV 0x30, A  	; Store result in memory address 0x30
+ORG 0000H
+	; Step 1: Select Register Bank 1
+	CLR RS1      ; RS1 = 0
+	SETB RS0     ; RS0 = 1
+	
+
+	; Step 2: Initialize pointers and registers
+	MOV R0, #30H   ; R0 = pointer to source
+	MOV R1, #0AH   ; R1 = counter = 10
+	MOV R2, #30H   ; R2 = LSB = 00H
+	MOV R3, #21H   ; R3 = MSB = 00H
+
+NEXT:		MOV A, @R0      ; Load data byte
+		ADD A, R2       ; Add to previous LSB
+		MOV R2, A       ; Store new LSB
+
+		JNC SKIP_CY     ; If no carry, skip
+		INC R3          ; If carry, increment MSB
+
+SKIP_CY:
+	INC R0          ; Move to next data byte
+	DJNZ R1, NEXT   ; Repeat for 10 bytes
+
+	; Final result: R3 = MSB, R2 = LSB
+
+	; Optional: Store result somewhere else
+	MOV 40H, R2   ; Store LSB at 40H
+	MOV 41H, R3   ; Store MSB at 41H
+
 	END
+
+
