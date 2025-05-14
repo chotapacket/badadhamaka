@@ -1,17 +1,22 @@
 ORG 0000H
-MOV R0, #30H   ; Load R0 with the starting address of Fahrenheit values
-MOV R1, #40H   ; Load R1 with the starting address to store Celsius values
-MOV R2, #04    ; Load R2 with the number of values to convert
 
-L1: MOV A, @R0  ; Load the Fahrenheit value from memory pointed by R0 into A
-    SUBB A, #32  ; Subtract 32 from A
-    MOV B, #9    ; Load B with 9
-    DIV AB       ; A = (F - 32) / 9
-    MOV B, #5    ; Load B with 5
-    MUL AB       ; Celsius conversion formula
-    MOV @R1, A   ; Store the result
-    INC R0       ; Increment R0 to point to the next Fahrenheit value
-    INC R1       ; Increment R1 to store the next Celsius value
-    DJNZ R2, L1  ; Decrement R2 and repeat until all values are processed
+MOV R0, #30H       ; Pointer to Fahrenheit data
+MOV R1, #40H       ; Pointer to Celsius result
+MOV R2, #05        ; Number of values to convert
 
-END             ; End of program
+LOOP:
+    MOV A, @R0     ; Load Fahrenheit value
+    CLR C
+    SUBB A, #32    ; A = F - 32
+    MOV B, #9
+    DIV AB         ; A = (F - 32) / 9, B = remainder (discarded)
+    MOV B, #5
+    MUL AB         ; A = ((F - 32)/9) * 5
+
+    MOV @R1, A     ; Store Celsius result
+
+    INC R0         ; Move to next Fahrenheit value
+    INC R1         ; Move to next Celsius storage location
+    DJNZ R2, LOOP  ; Repeat for next byte
+
+END
