@@ -4,14 +4,17 @@ SETB P1.1         ; Set P1.1 as input (Second bit of addition)
 
 Start: 			  ; Compute SUM = A XOR B
     
-    MOV C, P1.1   ; Move P1.1 (B) to Carry
-    CPL C         ; Complement Carry (C = NOT B)
-    ANL C, P1.0   ; AND with A (C = A AND NOT B)
-    MOV R0, C     ; Store intermediate result in Register R0
-
-    MOV C, P1.0   ; Move P1.0 (A) to Carry
+    
+	MOV C, P1.0   ; Move P1.0 (A) to Carry
     CPL C         ; Complement Carry (C = NOT A)
     ANL C, P1.1   ; AND with B (C = B AND NOT A)
+	MOV R0, C     ; Store intermediate result in Register R0
+	
+	MOV C, P1.1   ; Move P1.1 (B) to Carry
+    CPL C         ; Complement Carry (C = NOT B)
+    ANL C, P1.0   ; AND with A (C = A AND NOT B)
+    
+    
     ORL C, R0     ; OR with previously stored result
     MOV P1.2, C   ; Store SUM output in P1.2
 
