@@ -4,9 +4,9 @@ MOV R1, #40H   ; Load R1 with the starting address to store Celsius values
 MOV R2, #04    ; Load R2 with the number of values to convert
 
 L1: MOV A, @R0  ; Load the Fahrenheit value from memory pointed by R0 into A
-    SUBB A, #52  ; Subtract 52 from A
+    SUBB A, #32  ; Subtract 32 from A
     MOV B, #9    ; Load B with 9
-    DIV AB       ; A = (F - 52) / 9
+    DIV AB       ; A = (F - 32) / 9
     MOV B, #5    ; Load B with 5
     MUL AB       ; Celsius conversion formula
     MOV @R1, A   ; Store the result
