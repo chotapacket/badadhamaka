@@ -1,0 +1,99 @@
+lcd     equ   p0         ; Define LCD data port
+rs      equ   p2.0       ; Register Select pin
+en      equ   p2.1       ; Enable pin
+rw      equ   p2.2       ; Read/Write pin
+
+        ORG   0000H      ; Start of program memory
+        ACALL INIT_LCD   ; Initialize LCD
+
+        ; Display name on the first line
+        MOV   DPTR, #LCD_MSG1  
+        ACALL PRINT_LCD
+
+        ; Move cursor to the second line
+        MOV   A, #0C0H  
+        ACALL COMMAND
+
+        ; Display number on the second line
+        MOV   DPTR, #LCD_MSG2  
+        ACALL PRINT_LCD
+
+        ; Endless loop to keep displaying data
+        SJMP  $
+
+
+; Function: INIT_LCD
+; Description: Initializes LCD with required settings
+
+INIT_LCD:
+        MOV   A, #38H     ; Set 2-line, 5x8 matrix
+        ACALL COMMAND
+        MOV   A, #0EH     ; Display ON, Cursor ON, Blink off
+        ACALL COMMAND
+        MOV   A, #01H     ; Clear display
+        ACALL COMMAND
+        MOV   A, #06H     ; Entry mode: increment, no shift
+        ACALL COMMAND
+        MOV   A, #80H     ; Move cursor to beginning
+        ACALL COMMAND
+        RET
+
+
+; Function: PRINT_LCD
+; Description: Prints a string on the LCD
+; Input: DPTR points to the string
+
+PRINT_LCD:
+L3:     CLR   A             ; Clear accumulator
+        MOVC  A, @A+DPTR     ; Load character from memory
+        JZ    DONE          ; If null terminator, return
+        ACALL DISPLAY     ; Print character on LCD
+        INC   DPTR          ; Move to next character
+        SJMP  L3            ; Repeat
+DONE:   RET
+
+; Function: COMMAND
+; Description: Sends a command to the LCD
+; Input: A register contains command byte
+COMMAND:
+        ACALL DELAY          ; Delay before sending command
+        MOV   lcd, A         ; Send command to LCD
+        CLR   rs             ; Select command register
+        CLR   rw             ; Set write mode
+        SETB  en             ; Enable pulse
+        NOP
+        NOP
+        CLR   en             ; Disable pulse
+        RET
+		
+;Function to display character on LCD
+DISPLAY:
+ACALL DELAY
+MOV LCD,A
+SETB rs						; Set for data mode
+CLR rw						; Write mode
+SETB en						; Enable
+NOP							; Small delay
+NOP
+CLR en						; Disable
+RET
+
+
+; Function: DELAY
+; Description: Generates a small time delay
+
+DELAY:
+        MOV   R6, #20        ; Outer loop count
+D1:     MOV   R7, #250        ; Inner loop count
+D2:     DJNZ  R7, D2         ; Decrement inner loop
+        DJNZ  R6, D1         ; Decrement outer loop
+        RET
+
+
+; LCD Messages stored in memory
+
+        ORG   500H
+LCD_MSG1:  DB 'ABC', 0  ; Name string (null-terminated)
+LCD_MSG2:  DB '111000', 0            ; Number string (null-terminated)
+
+        END
