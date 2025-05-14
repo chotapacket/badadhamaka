@@ -1,32 +1,29 @@
 ORG 0000H
+
 	; Step 1: Select Register Bank 1
-	CLR RS1      ; RS1 = 0
-	SETB RS0     ; RS0 = 1
-	
+	MOV PSW, #08H      ; RS1=0, RS0=1 → Select Bank 1
 
-	; Step 2: Initialize pointers and registers
-	MOV R0, #30H   ; R0 = pointer to source
-	MOV R1, #0AH   ; R1 = counter = 10
-	MOV R2, #00H   ; R2 = LSB = 00H
-	MOV R3, #00H   ; R3 = MSB = 00H
+	; Step 2: Initialize pointers and accumulators
+	MOV R0, #30H       ; R0 = pointer to source (starts at 30H)
+	MOV R1, #10H       ; R1 = counter = 16 bytes
+	MOV R2, #00H       ; R2 = LSB of sum
+	MOV R3, #00H       ; R3 = MSB of sum
 
-NEXT:		MOV A, @R0      ; Load data byte
-		ADD A, R2       ; Add to previous LSB
-		MOV R2, A       ; Store new LSB
+NEXT:
+	MOV A, @R0         ; Load next byte
+	ADD A, R2          ; Add to current LSB
+	MOV R2, A          ; Store back to R2
 
-		JNC SKIP_CY     ; If no carry, skip
-		INC R3          ; If carry, increment MSB
+	JNC SKIP_CY        ; If no carry to MSB, skip
+	INC R3             ; If carry, increment MSB
 
 SKIP_CY:
-	INC R0          ; Move to next data byte
-	DJNZ R1, NEXT   ; Repeat for 10 bytes
+	INC R0             ; Point to next byte
+	DJNZ R1, NEXT      ; Loop until all bytes added
 
-	; Final result: R3 = MSB, R2 = LSB
+	; Result is now in R3:R2 (MSB:LSB)
+	; Optional: store result in safe memory locations
+	; MOV 40H, R2      ; Store LSB in 40H
+	; MOV 41H, R3      ; Store MSB in 41H
 
-	; Optional: Store result somewhere else
-	MOV 40H, R2   ; Store LSB at 40H
-	MOV 41H, R3   ; Store MSB at 41H
-
-	END
-
-
+END
