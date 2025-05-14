@@ -7,8 +7,8 @@ ORG 0000H
 	; Step 2: Initialize pointers and registers
 	MOV R0, #30H   ; R0 = pointer to source
 	MOV R1, #0AH   ; R1 = counter = 10
-	MOV R2, #30H   ; R2 = LSB = 00H
-	MOV R3, #21H   ; R3 = MSB = 00H
+	MOV R2, #00H   ; R2 = LSB = 00H
+	MOV R3, #00H   ; R3 = MSB = 00H
 
 NEXT:		MOV A, @R0      ; Load data byte
 		ADD A, R2       ; Add to previous LSB
