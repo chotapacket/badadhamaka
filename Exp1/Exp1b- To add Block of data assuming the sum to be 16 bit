@@ -23,7 +23,7 @@ SKIP_CY:
 
 	; Result is now in R3:R2 (MSB:LSB)
 	; Optional: store result in safe memory locations
-	; MOV 40H, R2      ; Store LSB in 40H
-	; MOV 41H, R3      ; Store MSB in 41H
+	MOV 40H, R2      ; Store LSB in 40H
+	MOV 41H, R3      ; Store MSB in 41H
 
 END
