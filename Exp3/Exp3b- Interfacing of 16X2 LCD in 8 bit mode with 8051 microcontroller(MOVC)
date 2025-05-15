@@ -89,7 +89,7 @@ D2:     MOV   R2, #255
 D3:     DJNZ  R2, D3
         DJNZ  R1, D2
         DJNZ  R0, D1
-        RET
+	RET
 
 
 ; LCD Messages stored in memory
