@@ -83,13 +83,13 @@ display:
 ; Function: delay
 ; Description: Provides a time delay
 
-DELAY: 	   mov R0,#07
+delay: 	   mov R0,#07
            L1: mov R1,#255
            L2: mov R2,#255
            L3: djnz R2 , L3
            djnz R1 , L2
            djnz R0 , L1
-           ret
+           ret
 
  ; Infinite loop to keep the program running
         sjmp $
