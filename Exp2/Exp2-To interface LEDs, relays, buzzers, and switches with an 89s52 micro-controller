@@ -36,6 +36,6 @@ DELAY:     mov R0,#07
            L3: djnz R2 , L3
            djnz R1 , L2
            djnz R0 , L1
-           ret
+	   ret
 
 		END               ; End of program		
