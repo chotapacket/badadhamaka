@@ -67,3 +67,12 @@ TRANS: 					   ; Subroutine to transmit data via UART
     RET                    ; Return from subroutine
 
     END                    ; End of program
+
+
+/*
+11.0592/12=921.6 KHz
+921.6/32=28,800
+TH1=28,800/9600=-3 #FDH
+TH1=28,800/4800=-6  #FAH
+TH1=28,800/2400=-12  #F4H
+*/
