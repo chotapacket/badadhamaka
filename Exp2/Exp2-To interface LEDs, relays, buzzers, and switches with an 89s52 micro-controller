@@ -30,13 +30,12 @@ CASE2:
 		SJMP START    ; Repeat the process
 
   
-DELAY:  			  ; Delay Subroutine
-		MOV R2, #7    ; Outer loop counter
-	L3: MOV R1, #255  ; Middle loop counter
-	L2: MOV R0, #255  ; Inner loop counter
-	L1: DJNZ R0, L1   ; Decrement R0 until 0
-		DJNZ R1, L2   ; Decrement R1 until 0
-		DJNZ R2, L3   ; Decrement R2 until 0
-		RET           ; Return from subroutine
+DELAY:     mov R0,#07
+           L1: mov R1,#255
+           L2: mov R2,#255
+           L3: djnz R2 , L3
+           djnz R1 , L2
+           djnz R0 , L1
+           ret
 
 		END               ; End of program		
