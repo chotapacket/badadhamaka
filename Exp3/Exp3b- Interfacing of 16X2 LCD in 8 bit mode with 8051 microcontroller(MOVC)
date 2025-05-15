@@ -83,10 +83,12 @@ RET
 ; Description: Generates a small time delay
 
 DELAY:
-        MOV   R6, #20        ; Outer loop count
-D1:     MOV   R7, #250        ; Inner loop count
-D2:     DJNZ  R7, D2         ; Decrement inner loop
-        DJNZ  R6, D1         ; Decrement outer loop
+        MOV   R0, #07
+D1:     MOV   R1, #255
+D2:     MOV   R2, #255
+D3:     DJNZ  R2, D3
+        DJNZ  R1, D2
+        DJNZ  R0, D1
         RET
 
 
