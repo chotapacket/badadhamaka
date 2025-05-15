@@ -38,4 +38,21 @@ DELAY:     mov R0,#07
            djnz R0 , L1
 	   ret
 
-		END               ; End of program		
+		END               ; End of program	
+
+
+/* Each DJNZ instruction takes 2 machine cycles.
+One machine cycle = 1 / (11.0592 MHz / 12) = 1.085 µs
+R2 loop: 255 × 2 cycles = 510 cycles
+
+R1 loop: 255 × 510 = 130,050 cycles
+
+R0 loop: 7 × 130,050 = 910,350 cycles
+
+Add some overhead (for MOV instructions and RET): let’s say ~50 cycles extra.
+
+So total ~ 910,400 cycles
+Time per cycle = 1.085 µs
+
+Total time = 910,400 × 1.085 µs = 989,784 µs ˜0.99 sec
+*/	
