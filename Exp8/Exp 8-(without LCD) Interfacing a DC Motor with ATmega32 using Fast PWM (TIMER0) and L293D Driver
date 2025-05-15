@@ -45,3 +45,18 @@ int main()
 		_delay_ms(1000);
 	}
 }
+
+
+/*AVR (ATmega16)
+--------------
+PB3 (OC0)  - IN2 (L293D)  → PWM (speed)
+PB4        ---> IN1 (L293D)  →→→ Direction
+VCC        ---> VCC1 (5V logic)
+GND        ---> GND (common)
+
+L293D
+-----
+OUT1 ↔ Motor Terminal 1
+OUT2 ↔ Motor Terminal 2
+VCC2 → Motor Power (e.g., 9V battery)
+*/
