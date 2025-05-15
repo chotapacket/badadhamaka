@@ -76,3 +76,14 @@ TH1=28,800/9600=-3 #FDH
 TH1=28,800/4800=-6  #FAH
 TH1=28,800/2400=-12  #F4H
 */
+
+/*  SM0 SM1 SM2 REN TB8 RB8 TI RI
+	 0   1   0   1   0   0  0  0
+	 
+Bit    7     6     5     4       3     2     1     0  
+Name   GATE  C/T   M1    M0      GATE  C/T   M1    M0  
+Use    T1    T1    T1    T1      T0    T0    T0    T0  
+Val     0     0     1     0       0     0     0     0  
+
+
+*/
